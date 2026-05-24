@@ -954,9 +954,43 @@
 <!-- ═══════════════════════════ SCRIPT ════════════════════════════════ -->
 <script>
 /* ══════════════════════════════════════════════════════════════
-   API CONFIG
+   DATOS HARDCODEADOS – PROTELA S.A. 2026
 ══════════════════════════════════════════════════════════════ */
-const API = 'http://localhost:5000/api';
+const ALL_DATA = [
+  { id:1,  fecha:"2026-01-07", sede:"ALAMOS",  planta:"Tintorería",  riesgo:"Químico",     nivel:"Alto",    descripcion:"Fuga de colorante ácido en tanque de tintura T-04; ausencia de bandejas de contención y EPP incompleto (sin guantes de nitrilo).",                                          accion:"Se detuvo la operación, se colocó señalización y se informó al supervisor de turno.",                                        reportador:"Carlos Mendoza",    cargo:"Operario tintura",       ubicacion:"Nave 1 – tanque T-04",              estado:"Cerrado"    },
+  { id:2,  fecha:"2026-01-12", sede:"ALAMOS",  planta:"Ramas",       riesgo:"Mecánico",    nivel:"Medio",   descripcion:"Guarda de protección de rama tensora #3 desajustada, permitiendo acceso a partes móviles durante operación normal.",                                                         accion:"Se detuvo la máquina y se reportó a mantenimiento para ajuste.",                                                             reportador:"Ana Lucía Pérez",   cargo:"Operaria ramas",         ubicacion:"Nave 2 – rama #3",                  estado:"Cerrado"    },
+  { id:3,  fecha:"2026-01-18", sede:"DORADO",  planta:"Circulares",  riesgo:"Locativo",    nivel:"Medio",   descripcion:"Derrame de aceite lubricante en piso de circulares, zona de tránsito peatonal sin señalizar ni contener.",                                                                    accion:"Se señalizó área y se limpió con aserrín. Pendiente reparación de manguera.",                                                reportador:"Jorge Ramírez",     cargo:"Mecánico",               ubicacion:"Nave 3 – pasillo central",          estado:"Cerrado"    },
+  { id:4,  fecha:"2026-01-22", sede:"ALAMOS",  planta:"Confección",  riesgo:"Ergonómico",  nivel:"Bajo",    descripcion:"Puesto de costura sin regulación de altura; operarias con postura forzada de cuello y hombros durante turnos de 8 horas.",                                                  accion:"Se realizó pausa activa y se reportó a SST para rediseño del puesto.",                                                       reportador:"María Fernández",   cargo:"Costurera",              ubicacion:"Módulo A – puesto 7",               estado:"Cerrado"    },
+  { id:5,  fecha:"2026-01-29", sede:"DORADO",  planta:"Almacén",     riesgo:"Locativo",    nivel:"Alto",    descripcion:"Estantería metálica con carga excesiva sin anclaje a pared; riesgo inminente de volcamiento sobre zona de paso.",                                                           accion:"Se restringió acceso al área y se notificó a mantenimiento para anclaje urgente.",                                           reportador:"Luis Torres",       cargo:"Almacenista",            ubicacion:"Almacén principal – estante E-12",  estado:"Cerrado"    },
+  { id:6,  fecha:"2026-02-03", sede:"ALAMOS",  planta:"Tintorería",  riesgo:"Eléctrico",   nivel:"Crítico", descripcion:"Panel eléctrico del horno de secado con tapa removida y bornes expuestos; riesgo de electrocución inminente para el operario.",                                             accion:"Se aisló el panel con cinta de seguridad y se detuvo el equipo. Electricista notificado de urgencia.",                       reportador:"Pedro Salinas",     cargo:"Operario tintorería",    ubicacion:"Nave 1 – horno H-02",               estado:"Cerrado"    },
+  { id:7,  fecha:"2026-02-08", sede:"DORADO",  planta:"Raschel",     riesgo:"Mecánico",    nivel:"Alto",    descripcion:"Cadena de transmisión de Raschel R-01 sin protección lateral; partículas metálicas proyectadas durante operación.",                                                         accion:"Se instaló protección provisional y se solicitó repuesto original a mantenimiento.",                                         reportador:"Sandra López",      cargo:"Operaria Raschel",       ubicacion:"Nave 4 – Raschel R-01",             estado:"Cerrado"    },
+  { id:8,  fecha:"2026-02-14", sede:"ALAMOS",  planta:"Urdidos",     riesgo:"Ergonómico",  nivel:"Medio",   descripcion:"Manipulación manual de conos de hilo de más de 20 kg sin ayuda mecánica; tres trabajadoras reportan dolor lumbar agudo.",                                                   accion:"Se indicó rotación de funciones y uso de faja lumbar. Se solicitó carro transportador.",                                     reportador:"Claudia Vargas",    cargo:"Operaria urdidos",       ubicacion:"Nave 5 – urdidora U-03",            estado:"En gestión" },
+  { id:9,  fecha:"2026-02-19", sede:"DORADO",  planta:"Tintorería",  riesgo:"Biológico",   nivel:"Bajo",    descripcion:"Acumulación de lodo orgánico en sump de la planta de tratamiento de aguas residuales sin limpieza programada hace 3 semanas.",                                              accion:"Se reportó a mantenimiento para limpieza urgente y reprogramación del mantenimiento preventivo.",                            reportador:"Andrés Castillo",   cargo:"Operario ambiental",     ubicacion:"Planta tratamiento – sump S-01",    estado:"En gestión" },
+  { id:10, fecha:"2026-02-25", sede:"ALAMOS",  planta:"Circulares",  riesgo:"Mecánico",    nivel:"Medio",   descripcion:"Agujas de circular C-07 con desgaste excesivo visible; riesgo de proyección de fragmentos durante tejido a alta velocidad.",                                               accion:"Se programó cambio de agujas para el siguiente turno de mantenimiento preventivo.",                                          reportador:"Fabio Moreno",      cargo:"Técnico circular",       ubicacion:"Nave 3 – circular C-07",            estado:"Cerrado"    },
+  { id:11, fecha:"2026-03-04", sede:"ALAMOS",  planta:"Ramas",       riesgo:"Eléctrico",   nivel:"Medio",   descripcion:"Cable de alimentación de rama R-02 con aislamiento deteriorado y empalme sin protección; riesgo de corto circuito.",                                                       accion:"Se inhabilitó la máquina hasta revisión por parte del electricista de planta.",                                              reportador:"Diana Herrera",     cargo:"Operaria ramas",         ubicacion:"Nave 2 – rama R-02",                estado:"Cerrado"    },
+  { id:12, fecha:"2026-03-09", sede:"DORADO",  planta:"Confección",  riesgo:"Mecánico",    nivel:"Bajo",    descripcion:"Máquina de coser industrial sin protector de aguja instalado; riesgo de pinchazo en dedos durante operación rutinaria.",                                                  accion:"Se solicitó instalación del protector de aguja al área de mantenimiento.",                                                   reportador:"Rosa Jiménez",      cargo:"Costurera",              ubicacion:"Módulo B – máquina MC-14",          estado:"En gestión" },
+  { id:13, fecha:"2026-03-13", sede:"ALAMOS",  planta:"Tintorería",  riesgo:"Químico",     nivel:"Alto",    descripcion:"Mezcla accidental de ácido acético con sosa cáustica en área de formulación; generación de vapores irritantes detectada.",                                                 accion:"Se evacuó el área, se activó ventilación de emergencia y se notificó al coordinador SST.",                                  reportador:"Héctor Quintero",   cargo:"Formulador",             ubicacion:"Nave 1 – formulación F-02",         estado:"Cerrado"    },
+  { id:14, fecha:"2026-03-18", sede:"DORADO",  planta:"Almacén",     riesgo:"Locativo",    nivel:"Medio",   descripcion:"Iluminación deficiente en pasillo de almacén 2; nivel de luxes por debajo del mínimo normativo (menor a 200 lux).",                                                        accion:"Se instalaron luminarias provisionales. Solicitud de mantenimiento correctivo enviada a infraestructura.",                   reportador:"Gustavo Restrepo",  cargo:"Auxiliar almacén",       ubicacion:"Almacén 2 – pasillo norte",         estado:"En gestión" },
+  { id:15, fecha:"2026-03-22", sede:"ALAMOS",  planta:"Tricot",      riesgo:"Mecánico",    nivel:"Medio",   descripcion:"Pasacinta de tricot T-04 trabado; operario intentó destrabar manualmente con la máquina aún en movimiento.",                                                               accion:"Se reforzó capacitación en procedimiento LOTO y se colocó aviso preventivo en la máquina.",                                 reportador:"Juan Pablo Osorio", cargo:"Operario tricot",        ubicacion:"Nave 6 – tricot T-04",              estado:"Cerrado"    },
+  { id:16, fecha:"2026-03-27", sede:"DORADO",  planta:"Raschel",     riesgo:"Psicosocial", nivel:"Bajo",    descripcion:"Trabajadores de turno nocturno reportan fatiga crónica y dificultades para mantener concentración; ambiente de supervisión excesiva.",                                     accion:"Se programó reunión con psicóloga ocupacional y se revisó la distribución de turnos rotativos.",                            reportador:"Mónica Suárez",     cargo:"Líder de turno",         ubicacion:"Nave 4 – turno noche",              estado:"En gestión" },
+  { id:17, fecha:"2026-04-02", sede:"ALAMOS",  planta:"Tintorería",  riesgo:"Químico",     nivel:"Medio",   descripcion:"Dispensadores de jabón y solución desinfectante vacíos en baños de producción; riesgo de contaminación bioquímica.",                                                       accion:"Se recargaron dispensadores y se estableció rutina de revisión y recarga diaria.",                                           reportador:"Yolanda Cárdenas",  cargo:"Auxiliar servicios",     ubicacion:"Baños producción – nave 1",         estado:"Cerrado"    },
+  { id:18, fecha:"2026-04-07", sede:"DORADO",  planta:"Circulares",  riesgo:"Eléctrico",   nivel:"Alto",    descripcion:"Tomacorriente trifásico sin tapa y con signos evidentes de sobrecalentamiento en área de circulares; olor a quemado.",                                                     accion:"Se aisló el circuito de forma inmediata y se solicitó reemplazo urgente al electricista.",                                  reportador:"Bernardo Soto",     cargo:"Mecánico eléctrico",     ubicacion:"Nave 3 – tablero TB-05",            estado:"Cerrado"    },
+  { id:19, fecha:"2026-04-11", sede:"ALAMOS",  planta:"Urdidos",     riesgo:"Locativo",    nivel:"Medio",   descripcion:"Piso de área de urdidos con fisura longitudinal de 3 metros; riesgo de tropiezos y caídas al mismo nivel.",                                                               accion:"Se señalizó con cinta de seguridad y se reportó a infraestructura para reparación programada.",                             reportador:"Camilo Arango",     cargo:"Operario urdidos",       ubicacion:"Nave 5 – zona de entrada",          estado:"Abierto"    },
+  { id:20, fecha:"2026-04-15", sede:"DORADO",  planta:"Tintorería",  riesgo:"Biológico",   nivel:"Medio",   descripcion:"Presencia de hongos visibles en paredes del cuarto de máquinas de la tintorería; trabajadores reportan síntomas respiratorios.",                                           accion:"Se notificó a SST, se inició limpieza con fungicida. Pendiente inspección médica laboral.",                                 reportador:"Liliana Montoya",   cargo:"Operaria tintorería",    ubicacion:"Cuarto máquinas – nave 2",          estado:"Abierto"    },
+  { id:21, fecha:"2026-04-19", sede:"ALAMOS",  planta:"Confección",  riesgo:"Ergonómico",  nivel:"Medio",   descripcion:"Operarias de confección realizan movimiento repetitivo de pinzas sin pausas activas; reporte de tendinitis bilateral emergente.",                                           accion:"Se implementó pausa obligatoria de 5 min cada 2 horas y se solicitó evaluación por fisioterapeuta.",                        reportador:"Patricia Rueda",    cargo:"Supervisora confección", ubicacion:"Módulo C – línea 2",                estado:"En gestión" },
+  { id:22, fecha:"2026-04-24", sede:"DORADO",  planta:"Ramas",       riesgo:"Mecánico",    nivel:"Alto",    descripcion:"Freno de emergencia de rama R-05 con tiempo de respuesta excesivo (mayor a 3 segundos en prueba); riesgo de atrapamiento.",                                               accion:"Se suspendió la máquina de forma inmediata y se escaló a mantenimiento especializado externo.",                             reportador:"Roberto Cano",      cargo:"Técnico ramas",          ubicacion:"Nave 2 – rama R-05",                estado:"Abierto"    },
+  { id:23, fecha:"2026-04-28", sede:"ALAMOS",  planta:"Almacén",     riesgo:"Locativo",    nivel:"Bajo",    descripcion:"Escalera de acceso a estanterías altas sin puntas antideslizantes; reportes de inestabilidad al subir.",                                                                   accion:"Se reemplazó escalera por una con puntas de goma certificadas. Equipo viejo dado de baja.",                                 reportador:"Susana Delgado",    cargo:"Auxiliar almacén",       ubicacion:"Almacén – estante alto zona A",     estado:"Cerrado"    },
+  { id:24, fecha:"2026-05-02", sede:"DORADO",  planta:"Circulares",  riesgo:"Psicosocial", nivel:"Medio",   descripcion:"Conflicto laboral entre trabajadores del turno diurno por asignación inequitativa de maquinaria; ambiente hostil percibido.",                                              accion:"Se realizó mediación con apoyo de recursos humanos y coordinador SST.",                                                      reportador:"Natalia Gómez",     cargo:"Operaria circulares",    ubicacion:"Nave 3 – área de producción",       estado:"En gestión" },
+  { id:25, fecha:"2026-05-05", sede:"ALAMOS",  planta:"Tintorería",  riesgo:"Químico",     nivel:"Crítico", descripcion:"Derrame de 50 litros de auxiliar dispersante en piso; trabajador sin botas impermeables sufrió contacto dérmico extenso.",                                                accion:"Se atendió al trabajador en enfermería, se delimitó zona y se inició limpieza con absorbente.",                             reportador:"Esteban Nieto",     cargo:"Operario tintorería",    ubicacion:"Nave 1 – área dispensación",        estado:"Abierto"    },
+  { id:26, fecha:"2026-05-07", sede:"DORADO",  planta:"Urdidos",     riesgo:"Eléctrico",   nivel:"Medio",   descripcion:"Luz de emergencia del pasillo principal de urdidos sin batería funcional; no activa durante simulacros de evacuación.",                                                    accion:"Se solicitó reemplazo de batería al área de mantenimiento eléctrico preventivo.",                                           reportador:"Carmenza Leal",     cargo:"Operaria urdidos",       ubicacion:"Nave 5 – pasillo evacuación",       estado:"Abierto"    },
+  { id:27, fecha:"2026-05-09", sede:"ALAMOS",  planta:"Raschel",     riesgo:"Mecánico",    nivel:"Alto",    descripcion:"Ventilador de extracción de pelusas de Raschel R-03 bloqueado; acumulación de fibras inflamables cerca del motor eléctrico.",                                             accion:"Se detuvo la máquina y se limpió acumulación de fibras. Pendiente revisión preventiva completa.",                           reportador:"Rodrigo Arias",     cargo:"Mecánico",               ubicacion:"Nave 4 – Raschel R-03",             estado:"Abierto"    },
+  { id:28, fecha:"2026-05-12", sede:"DORADO",  planta:"Confección",  riesgo:"Locativo",    nivel:"Bajo",    descripcion:"Señalización de rutas de evacuación en módulo D deteriorada y con colores desvanecidos, incumpliendo NTC 1461.",                                                           accion:"Se reportó a SST para reposición inmediata de señales de evacuación estandarizadas.",                                       reportador:"Viviana Salazar",   cargo:"Costurera",              ubicacion:"Módulo D – pasillos internos",      estado:"Abierto"    },
+  { id:29, fecha:"2026-05-14", sede:"ALAMOS",  planta:"Circulares",  riesgo:"Ergonómico",  nivel:"Bajo",    descripcion:"Herramienta de puesta a punto de circulares con mango inadecuado; fuerza de agarre excesiva reportada por varios operarios.",                                              accion:"Se reportó a compras para adquisición de herramientas ergonómicas certificadas.",                                           reportador:"Felipe Castañeda",  cargo:"Técnico circular",       ubicacion:"Nave 3 – banco de ajuste",          estado:"Abierto"    },
+  { id:30, fecha:"2026-05-14", sede:"DORADO",  planta:"Tintorería",  riesgo:"Biológico",   nivel:"Bajo",    descripcion:"Falta de separación de residuos biológicos (textiles contaminados) en tintorería; mezclados con residuos ordinarios.",                                                    accion:"Se reforzó capacitación en gestión de residuos y se redistribuyeron los contenedores de clasificación.",                   reportador:"Carolina Bernal",   cargo:"Operaria ambiental",     ubicacion:"Nave 2 – punto ecológico",          estado:"Abierto"    },
+];
+
+const HH_PERIODO = 85000;
+let nextId = ALL_DATA.length + 1;
 
 let loadedData = { reportes: [], kpis: {}, tendencia: { meses:[], abiertos:[], cerrados:[] }, total: 0 };
 
@@ -972,22 +1006,48 @@ const RIESGO_COLORS = {
 const NIVEL_BADGE  = { "Bajo":"badge-green","Medio":"badge-yellow","Alto":"badge-orange","Crítico":"badge-red" };
 const ESTADO_BADGE = { "Abierto":"badge-red","En gestión":"badge-yellow","Cerrado":"badge-green" };
 
-// ── Fetch ──────────────────────────────────────────────────────────
-async function fetchData() {
-  const p = new URLSearchParams();
-  if (AF.sede   && AF.sede   !== "ALL") p.set("sede",   AF.sede);
-  if (AF.planta && AF.planta !== "ALL") p.set("planta", AF.planta);
-  if (AF.riesgo && AF.riesgo !== "ALL") p.set("riesgo", AF.riesgo);
-  if (AF.estado && AF.estado !== "ALL") p.set("estado", AF.estado);
-  if (AF.desde) p.set("desde", AF.desde);
-  if (AF.hasta) p.set("hasta", AF.hasta);
-  const res = await fetch(`${API}/sst?${p}`);
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json();
+// ── Filtrado local ─────────────────────────────────────────────
+function getFilteredData() {
+  let rows = ALL_DATA.slice();
+  if (AF.sede   !== "ALL") rows = rows.filter(r => r.sede   === AF.sede);
+  if (AF.planta !== "ALL") rows = rows.filter(r => r.planta === AF.planta);
+  if (AF.riesgo !== "ALL") rows = rows.filter(r => r.riesgo === AF.riesgo);
+  if (AF.estado !== "ALL") rows = rows.filter(r => r.estado === AF.estado);
+  if (AF.desde) rows = rows.filter(r => r.fecha >= AF.desde);
+  if (AF.hasta) rows = rows.filter(r => r.fecha <= AF.hasta);
+  return rows;
+}
+
+function computeKPIs(rows) {
+  const total        = rows.length;
+  const abiertos     = rows.filter(r => r.estado === "Abierto").length;
+  const accidentes   = rows.filter(r => r.nivel === "Alto" || r.nivel === "Crítico").length;
+  const diasPerdidos = accidentes * 4;
+  const IF  = total > 0 ? +(accidentes   * 200000 / HH_PERIODO).toFixed(2) : 0;
+  const IS  = total > 0 ? +(diasPerdidos * 200000 / HH_PERIODO).toFixed(2) : 0;
+  const ILI = +(IF * IS / 1000).toFixed(2);
+  return { total, abiertos, IF, IS, ILI };
+}
+
+function computeTendencia(rows) {
+  const monthMap = {};
+  rows.forEach(r => {
+    const mes = r.fecha.slice(0, 7);
+    if (!monthMap[mes]) monthMap[mes] = { abiertos: 0, cerrados: 0 };
+    if (r.estado === "Cerrado") monthMap[mes].cerrados++;
+    else monthMap[mes].abiertos++;
+  });
+  const meses = Object.keys(monthMap).sort();
+  const MESES_ES = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
+  return {
+    meses:    meses.map(m => MESES_ES[parseInt(m.slice(5,7)) - 1] + " " + m.slice(0,4)),
+    abiertos: meses.map(m => monthMap[m].abiertos),
+    cerrados: meses.map(m => monthMap[m].cerrados),
+  };
 }
 
 /* ══════════════════════════════════════════════════════════════
-   FILTROS  (el filtrado lo hace el backend)
+   FILTROS  (filtrado local)
 ══════════════════════════════════════════════════════════════ */
 const AF = { sede:"ALL", planta:"ALL", riesgo:"ALL", estado:"ALL", desde:"", hasta:"" };
 
@@ -995,20 +1055,20 @@ function bindFilters() {
   const ids  = ["fSede","fPlanta","fRiesgo","fEstado"];
   const keys = ["sede","planta","riesgo","estado"];
   ids.forEach((id, i) => {
-    document.getElementById(id).addEventListener("change", async e => {
+    document.getElementById(id).addEventListener("change", e => {
       AF[keys[i]] = e.target.value;
-      updateFilterBadge(); await renderAll();
+      updateFilterBadge(); renderAll();
     });
   });
-  document.getElementById("fDesde").addEventListener("change", async e => { AF.desde = e.target.value; updateFilterBadge(); await renderAll(); });
-  document.getElementById("fHasta").addEventListener("change", async e => { AF.hasta = e.target.value; updateFilterBadge(); await renderAll(); });
-  document.getElementById("fClear").addEventListener("click", async () => {
+  document.getElementById("fDesde").addEventListener("change", e => { AF.desde = e.target.value; updateFilterBadge(); renderAll(); });
+  document.getElementById("fHasta").addEventListener("change", e => { AF.hasta = e.target.value; updateFilterBadge(); renderAll(); });
+  document.getElementById("fClear").addEventListener("click", () => {
     AF.sede = AF.planta = AF.riesgo = AF.estado = "ALL";
     AF.desde = ""; AF.hasta = "";
     ["fSede","fPlanta","fRiesgo","fEstado"].forEach(id => document.getElementById(id).value = "ALL");
     document.getElementById("fDesde").value = "2026-01-01";
     document.getElementById("fHasta").value = "2026-05-14";
-    updateFilterBadge(); await renderAll();
+    updateFilterBadge(); renderAll();
   });
 }
 
@@ -1021,7 +1081,7 @@ function updateFilterBadge() {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   KPIs  (calculados por el backend)
+   KPIs  (calculados localmente)
 ══════════════════════════════════════════════════════════════ */
 function renderKPIs(kpis) {
   const k = kpis || {};
@@ -1034,7 +1094,7 @@ function renderKPIs(kpis) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   CHARTS  (data y tendencia vienen del backend)
+   CHARTS  (data y tendencia calculadas localmente)
 ══════════════════════════════════════════════════════════════ */
 let chartRiesgo, chartSede, chartTrend, chartPlanta;
 
@@ -1203,7 +1263,7 @@ document.getElementById("tSearch").addEventListener("input", () => { currentPage
 let detalleId = null;
 window.verDetalle = function(id) {
   detalleId = id;
-  const r = loadedData.reportes.find(x => x.id === id);
+  const r = ALL_DATA.find(x => x.id === id);
   if (!r) return;
   document.getElementById("detalleTitle").textContent = `Detalle del Reporte #${String(r.id).padStart(3,"0")}`;
   document.getElementById("detalleSub").textContent   = `${r.fecha} · ${r.planta} · ${r.sede === "ALAMOS" ? "Sede Álamos" : "Sede El Dorado"}`;
@@ -1247,24 +1307,13 @@ function campo(label, val) {
   </div>`;
 }
 
-document.getElementById("btnCambiarEstado").addEventListener("click", async () => {
-  const r = loadedData.reportes.find(x => x.id === detalleId);
+document.getElementById("btnCambiarEstado").addEventListener("click", () => {
+  const r = ALL_DATA.find(x => x.id === detalleId);
   if (!r) return;
-  const nuevoEstado = r.estado === "Abierto" ? "En gestión" : "Cerrado";
-  try {
-    const res = await fetch(`${API}/sst/${detalleId}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ estado: nuevoEstado })
-    });
-    if (!res.ok) throw new Error("Error actualizando estado");
-    document.getElementById("modalDetalle").classList.remove("open");
-    await renderAll();
-    showToast("Estado del reporte actualizado correctamente");
-  } catch (e) {
-    console.error(e);
-    showToast("Error al actualizar el estado");
-  }
+  r.estado = r.estado === "Abierto" ? "En gestión" : "Cerrado";
+  document.getElementById("modalDetalle").classList.remove("open");
+  renderAll();
+  showToast("Estado del reporte actualizado correctamente");
 });
 
 document.getElementById("closeModalDetalle").addEventListener("click", () => document.getElementById("modalDetalle").classList.remove("open"));
@@ -1302,7 +1351,7 @@ document.getElementById("modalDetalle").addEventListener("click", e => {
     document.getElementById("modalDetalle").classList.remove("open");
 });
 
-document.getElementById("submitReporte").addEventListener("click", async () => {
+document.getElementById("submitReporte").addEventListener("click", () => {
   const fecha      = document.getElementById("rFecha").value;
   const sede       = document.getElementById("rSede").value;
   const planta     = document.getElementById("rPlanta").value;
@@ -1331,26 +1380,15 @@ document.getElementById("submitReporte").addEventListener("click", async () => {
     return;
   }
 
-  try {
-    const res = await fetch(`${API}/sst`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ fecha, sede, planta, riesgo, nivel, descripcion: desc, accion, reportador, cargo, ubicacion })
-    });
-    if (!res.ok) {
-      const err = await res.json();
-      errEl.innerHTML = (err.errors || ["Error al guardar"]).map(e => `• ${e}`).join("<br>");
-      errEl.style.display = "block";
-      return;
-    }
-    const created = await res.json();
-    document.getElementById("modalReporte").classList.remove("open");
-    await renderAll();
-    showToast(`Reporte #${String(created.id).padStart(3,"0")} registrado correctamente`);
-  } catch (e) {
-    errEl.innerHTML = "• Error de conexión con el servidor.";
-    errEl.style.display = "block";
-  }
+  const newReport = {
+    id: nextId++, fecha, sede, planta, riesgo, nivel,
+    descripcion: desc, accion, reportador, cargo, ubicacion,
+    estado: "Abierto"
+  };
+  ALL_DATA.unshift(newReport);
+  document.getElementById("modalReporte").classList.remove("open");
+  renderAll();
+  showToast(`Reporte #${String(newReport.id).padStart(3,"0")} registrado correctamente`);
 });
 
 /* ══════════════════════════════════════════════════════════════
@@ -1364,20 +1402,18 @@ function showToast(msg) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   RENDER ALL  (async, consume el backend)
+   RENDER ALL  (local, sin llamadas de red)
 ══════════════════════════════════════════════════════════════ */
-async function renderAll() {
-  try {
-    loadedData = await fetchData();
-    renderKPIs(loadedData.kpis);
-    renderCharts(loadedData.reportes, loadedData.tendencia);
-    tableData = [...loadedData.reportes];
-    currentPage = 1;
-    renderTable();
-  } catch (err) {
-    console.error("Error cargando datos SST:", err);
-    showToast("Error conectando al servidor. Verifica que el backend esté activo.");
-  }
+function renderAll() {
+  const rows      = getFilteredData();
+  const kpis      = computeKPIs(rows);
+  const tendencia = computeTendencia(rows);
+  loadedData = { reportes: rows, kpis, tendencia, total: rows.length };
+  renderKPIs(kpis);
+  renderCharts(rows, tendencia);
+  tableData = [...rows];
+  currentPage = 1;
+  renderTable();
 }
 
 // ── Indicador de estado de conexión ───────────────────────────────
@@ -1388,14 +1424,10 @@ function setApiStatus(ok, msg) {
   document.getElementById("apiLabel").style.color    = ok ? "#22c55e" : "#ef4444";
 }
 
-document.addEventListener("DOMContentLoaded", async () => {
+document.addEventListener("DOMContentLoaded", () => {
   bindFilters();
-  try {
-    await renderAll();
-    setApiStatus(true, "API conectada · localhost:5000");
-  } catch {
-    setApiStatus(false, "Sin conexión al backend");
-  }
+  renderAll();
+  setApiStatus(true, "Datos locales · modo demo");
 });
 </script>
 </body>
