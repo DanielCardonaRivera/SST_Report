@@ -1,0 +1,49 @@
+<app-header
+  [connected]="connected"
+  (newReport)="showNewModal = true">
+</app-header>
+
+<main>
+  <app-filter-bar
+    [options]="options"
+    (filterChange)="onFilterChange($event)">
+  </app-filter-bar>
+
+  <app-kpi-cards [kpis]="kpis"></app-kpi-cards>
+
+  <app-charts-row
+    [reportes]="reportes"
+    [tendencia]="tendencia">
+  </app-charts-row>
+
+  <div class="bottom-row">
+    <app-planta-chart [reportes]="reportes"></app-planta-chart>
+    <app-reports-table
+      [reportes]="reportes"
+      (viewDetail)="onViewDetail($event)">
+    </app-reports-table>
+  </div>
+</main>
+
+@if (showNewModal) {
+  <app-new-report-modal
+    [options]="options"
+    (close)="showNewModal = false"
+    (submitReport)="onSubmitReport($event)">
+  </app-new-report-modal>
+}
+
+@if (selectedReport) {
+  <app-report-detail-modal
+    [report]="selectedReport"
+    (close)="selectedReport = null"
+    (statusChange)="onStatusChange($event)">
+  </app-report-detail-modal>
+}
+
+<div class="toast" [class.show]="toastVisible">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+    <path d="M20 6 9 17l-5-5"/>
+  </svg>
+  {{ toastMsg }}
+</div>
