@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SST – Seguridad Laboral · PROTELA SA</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:       #0f1117;
+      --surface:  #1a1d27;
+      --card:     #1e2130;
+      --border:   #2a2e42;
+      --accent:   #4f8ef7;
+      --green:    #22c55e;
+      --yellow:   #f59e0b;
+      --red:      #ef4444;
+      --purple:   #a855f7;
+      --cyan:     #06b6d4;
+      --orange:   #f97316;
+      --text:     #e2e8f0;
+      --muted:    #8892a4;
+      --radius:   12px;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-size: 14px;
+      min-height: 100vh;
+    }
+
+    /* ── Header ─────────────────────────────────────── */
+    header {
+      background: linear-gradient(135deg, #1a1d27 0%, #12151f 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 7px 28px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .logo-area { display: flex; align-items: center; gap: 10px; }
+    .logo-badge {
+      width: 30px; height: 30px;
+      background: linear-gradient(135deg, #f97316, #ef4444);
+      border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 11px; color: #fff;
+      flex-shrink: 0;
+    }
+    .header-center { text-align: center; }
+    header h1 { font-size: 19px; font-weight: 500; letter-spacing: .8px; text-transform: uppercase; }
+    header p  { font-size: 10px; color: var(--muted); margin-top: 1px; letter-spacing: .3px; }
+    .header-right { display: flex; align-items: center; gap: 12px; justify-content: flex-end; }
+    .btn-primary {
+      background: linear-gradient(135deg, #f97316, #ef4444);
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity .2s;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .btn-primary:hover { opacity: .85; }
+
+    /* ── Main layout ────────────────────────────────── */
+    main { padding: 12px 28px; display: flex; flex-direction: column; gap: 10px; }
+
+    /* ── Filter bar ─────────────────────────────────── */
+    .filter-bar {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+    }
+    .filter-group { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    .filter-label {
+      font-size: 9px; color: var(--muted); font-weight: 600;
+      text-transform: uppercase; letter-spacing: .8px; white-space: nowrap;
+    }
+    .filter-select {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      padding: 4px 22px 4px 8px;
+      font-size: 11px;
+      outline: none;
+      cursor: pointer;
+      width: 140px;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238892a4' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 6px center;
+      transition: border-color .15s;
+    }
+    .filter-select:focus { border-color: var(--accent); }
+    .filter-input-date {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      padding: 4px 8px;
+      font-size: 11px;
+      outline: none;
+      width: 130px;
+      transition: border-color .15s;
+    }
+    .filter-input-date:focus { border-color: var(--accent); }
+    .filter-sep { width: 1px; height: 20px; background: var(--border); flex-shrink: 0; }
+    .filter-clear {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      color: var(--muted);
+      padding: 5px 12px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all .15s;
+      white-space: nowrap;
+    }
+    .filter-clear:hover { border-color: var(--red); color: var(--red); }
+    .filter-active-count {
+      background: rgba(249,115,22,.15);
+      color: var(--orange);
+      border: 1px solid rgba(249,115,22,.3);
+      border-radius: 99px;
+      padding: 2px 9px;
+      font-size: 10px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    /* ── KPI row ────────────────────────────────────── */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+    }
+    .kpi-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .kpi-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; }
+    .kpi-val   { font-size: 24px; font-weight: 700; line-height: 1.1; }
+    .kpi-sub   { font-size: 10px; color: var(--muted); margin-top: 2px; }
+    .kpi-sub .up   { color: var(--green); }
+    .kpi-sub .down { color: var(--red); }
+
+    /* ── Charts row ─────────────────────────────────── */
+    .charts-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      align-items: stretch;
+    }
+    .chart-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+    }
+    .chart-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .chart-card-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.3;
+    }
+    .chart-card-title span {
+      display: block;
+      font-size: 10px;
+      font-weight: 400;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .chart-wrap {
+      position: relative;
+      height: 160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .chart-wrap-bar {
+      flex: 1;
+      min-height: 160px;
+    }
+    .chart-wrap-line {
+      flex: 1;
+      min-height: 180px;
+    }
+    .doughnut-center {
+      position: absolute;
+      text-align: center;
+      pointer-events: none;
+    }
+    .doughnut-center .dc-val { font-size: 20px; font-weight: 700; }
+    .doughnut-center .dc-lbl { font-size: 10px; color: var(--muted); margin-top: 2px; }
+    .chart-legend {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--muted);
+      flex: 1 1 40%;
+    }
+    .legend-dot {
+      width: 10px; height: 10px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    /* ── Bottom row ─────────────────────────────────── */
+    .bottom-row {
+      display: grid;
+      grid-template-columns: 1fr 1.6fr;
+      gap: 12px;
+      align-items: stretch;
+    }
+
+    /* ── Table ──────────────────────────────────────── */
+    .table-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .table-header-bar {
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      gap: 10px;
+    }
+    .table-header-bar .title { font-size: 14px; font-weight: 600; }
+    .table-search {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      color: var(--text);
+      padding: 6px 12px 6px 32px;
+      font-size: 12px;
+      width: 200px;
+      outline: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238892a4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: 10px center;
+    }
+    .table-search::placeholder { color: var(--muted); }
+    .table-scroll { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    thead th {
+      background: var(--surface);
+      padding: 9px 12px;
+      text-align: left;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .8px;
+      text-transform: uppercase;
+      color: var(--muted);
+      white-space: nowrap;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      user-select: none;
+    }
+    thead th:hover { color: var(--text); }
+    tbody tr { border-bottom: 1px solid rgba(255,255,255,.04); transition: background .12s; }
+    tbody tr:hover { background: rgba(249,115,22,.05); }
+    tbody td { padding: 9px 12px; white-space: nowrap; color: var(--text); }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 9px;
+      border-radius: 99px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .4px;
+    }
+    .badge-green   { background: rgba(34,197,94,.15);   color: #22c55e; }
+    .badge-red     { background: rgba(239,68,68,.15);    color: #ef4444; }
+    .badge-yellow  { background: rgba(245,158,11,.15);   color: #f59e0b; }
+    .badge-blue    { background: rgba(79,142,247,.15);   color: #4f8ef7; }
+    .badge-purple  { background: rgba(168,85,247,.15);   color: #a855f7; }
+    .badge-orange  { background: rgba(249,115,22,.15);   color: #f97316; }
+    .badge-cyan    { background: rgba(6,182,212,.15);    color: #06b6d4; }
+    .table-pagination {
+      padding: 10px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .page-btns { display: flex; gap: 4px; }
+    .page-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      color: var(--text);
+      padding: 4px 10px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all .12s;
+    }
+    .page-btn:hover, .page-btn.active { background: var(--orange); border-color: var(--orange); color: #fff; }
+
+    /* ── Trend chart card ───────────────────────────── */
+    .trend-filters { display: flex; gap: 6px; }
+    .filter-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--muted);
+      padding: 4px 10px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .filter-btn.active, .filter-btn:hover {
+      background: var(--orange);
+      border-color: var(--orange);
+      color: #fff;
+    }
+
+    /* ── Scrollbar ──────────────────────────────────── */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+    /* ── Modal overlay ──────────────────────────────── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.65);
+      backdrop-filter: blur(6px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      width: min(96vw, 680px);
+      max-height: 92vh;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      animation: modalIn .22s ease;
+    }
+    @keyframes modalIn {
+      from { transform: scale(.95) translateY(10px); opacity: 0; }
+      to   { transform: scale(1)   translateY(0);    opacity: 1; }
+    }
+    .modal-header {
+      padding: 22px 24px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .modal-title { font-size: 16px; font-weight: 700; }
+    .modal-sub   { font-size: 12px; color: var(--muted); margin-top: 3px; }
+    .modal-close {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--muted);
+      width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all .12s;
+      flex-shrink: 0;
+    }
+    .modal-close:hover { color: var(--text); border-color: var(--text); }
+    .modal-body { padding: 20px 24px; display: flex; flex-direction: column; gap: 16px; }
+
+    /* ── Form styles ────────────────────────────────── */
+    .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group.full { grid-column: 1 / -1; }
+    .form-label {
+      font-size: 11px; font-weight: 600; color: var(--muted);
+      text-transform: uppercase; letter-spacing: .7px;
+    }
+    .form-label .req { color: var(--red); margin-left: 2px; }
+    .form-input, .form-select, .form-textarea {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      padding: 9px 12px;
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color .15s;
+      width: 100%;
+    }
+    .form-select {
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238892a4' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      padding-right: 30px;
+      cursor: pointer;
+    }
+    .form-textarea { resize: vertical; min-height: 80px; }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--orange); }
+    .form-input.error, .form-select.error { border-color: var(--red); }
+
+    /* Radio tiles */
+    .radio-tiles { display: flex; gap: 8px; flex-wrap: wrap; }
+    .radio-tile {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--text);
+      transition: all .15s;
+      flex: 1;
+      min-width: 0;
+      white-space: nowrap;
+    }
+    .radio-tile input[type="radio"] { display: none; }
+    .radio-tile-dot {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      flex-shrink: 0;
+      transition: all .15s;
+    }
+    .radio-tile:has(input:checked) {
+      border-color: var(--orange);
+      background: rgba(249,115,22,.08);
+      color: var(--orange);
+    }
+    .radio-tile:has(input:checked) .radio-tile-dot {
+      border-color: var(--orange);
+      background: var(--orange);
+    }
+
+    /* Modal footer */
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .btn-cancel {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--muted);
+      padding: 8px 18px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .btn-cancel:hover { border-color: var(--red); color: var(--red); }
+    .btn-submit {
+      background: linear-gradient(135deg, #f97316, #ef4444);
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      padding: 8px 22px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity .15s;
+      display: flex; align-items: center; gap: 7px;
+    }
+    .btn-submit:hover { opacity: .88; }
+
+    /* Error banner */
+    .form-error {
+      display: none;
+      background: rgba(239,68,68,.1);
+      border: 1px solid rgba(239,68,68,.3);
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 12px;
+      color: var(--red);
+    }
+
+    /* Success toast */
+    .toast {
+      position: fixed;
+      bottom: 28px; right: 28px;
+      background: var(--card);
+      border: 1px solid var(--green);
+      border-radius: 10px;
+      padding: 12px 18px;
+      font-size: 13px;
+      color: var(--green);
+      z-index: 2000;
+      display: flex; align-items: center; gap: 10px;
+      box-shadow: 0 4px 24px rgba(0,0,0,.5);
+      animation: toastIn .3s ease;
+      display: none;
+    }
+    .toast.show { display: flex; }
+    @keyframes toastIn {
+      from { transform: translateY(20px); opacity: 0; }
+      to   { transform: translateY(0); opacity: 1; }
+    }
+
+    /* Detail modal table */
+    .modal-wide {
+      width: min(96vw, 900px);
+    }
+
+    /* ── Responsive ─────────────────────────────────── */
+    @media (max-width: 1100px) {
+      .kpi-row    { grid-template-columns: repeat(3, 1fr); }
+      .charts-row { grid-template-columns: 1fr 1fr; }
+      .bottom-row { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 700px) {
+      main { padding: 12px; }
+      .kpi-row    { grid-template-columns: repeat(2, 1fr); }
+      .charts-row { grid-template-columns: 1fr; }
+      .form-grid-2, .form-grid-3 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ HEADER ════════════════════════════════ -->
+<header>
+  <div class="logo-area">
+    <div class="logo-badge">SST</div>
+  </div>
+  <div class="header-center">
+    <h1>Gestión de Seguridad Laboral</h1>
+    <p>Reporte y seguimiento de condiciones inseguras · PROTELA S.A. 2026</p>
+  </div>
+  <div class="header-right">
+    <div id="apiStatus" style="display:flex;align-items:center;gap:7px;font-size:11px;color:#8892a4;background:#1e2130;border:1px solid #2a2e42;border-radius:8px;padding:5px 12px">
+      <span id="apiDot" style="width:8px;height:8px;border-radius:50%;background:#2a2e42;flex-shrink:0;transition:background .3s"></span>
+      <span id="apiLabel">Conectando…</span>
+    </div>
+    <button class="btn-primary" id="btnNuevoReporte">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+      Reportar Condición Insegura
+    </button>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════ MAIN ══════════════════════════════════ -->
+<main>
+
+  <!-- 0. FILTER BAR -->
+  <div class="filter-bar">
+    <div class="filter-group">
+      <span class="filter-label">Sede</span>
+      <select class="filter-select" id="fSede">
+        <option value="ALL">Todas las sedes</option>
+        <option value="ALAMOS">Álamos</option>
+        <option value="DORADO">El Dorado</option>
+      </select>
+    </div>
+    <div class="filter-sep"></div>
+    <div class="filter-group">
+      <span class="filter-label">Planta / Área</span>
+      <select class="filter-select" id="fPlanta">
+        <option value="ALL">Todas las plantas</option>
+        <option value="Tintorería">Tintorería</option>
+        <option value="Ramas">Ramas</option>
+        <option value="Circulares">Circulares</option>
+        <option value="Raschel">Raschel</option>
+        <option value="Tricot">Tricot</option>
+        <option value="Urdidos">Urdidos</option>
+        <option value="Confección">Confección</option>
+        <option value="Almacén">Almacén</option>
+      </select>
+    </div>
+    <div class="filter-sep"></div>
+    <div class="filter-group">
+      <span class="filter-label">Tipo de Riesgo</span>
+      <select class="filter-select" id="fRiesgo">
+        <option value="ALL">Todos los riesgos</option>
+        <option value="Mecánico">Mecánico</option>
+        <option value="Biológico">Biológico</option>
+        <option value="Químico">Químico</option>
+        <option value="Ergonómico">Ergonómico</option>
+        <option value="Locativo">Locativo</option>
+        <option value="Eléctrico">Eléctrico</option>
+        <option value="Psicosocial">Psicosocial</option>
+      </select>
+    </div>
+    <div class="filter-sep"></div>
+    <div class="filter-group">
+      <span class="filter-label">Estado</span>
+      <select class="filter-select" id="fEstado">
+        <option value="ALL">Todos los estados</option>
+        <option value="Abierto">Abierto</option>
+        <option value="En gestión">En gestión</option>
+        <option value="Cerrado">Cerrado</option>
+      </select>
+    </div>
+    <div class="filter-sep"></div>
+    <div class="filter-group">
+      <span class="filter-label">Desde</span>
+      <input type="date" class="filter-input-date" id="fDesde" value="2026-01-01">
+    </div>
+    <div class="filter-group">
+      <span class="filter-label">Hasta</span>
+      <input type="date" class="filter-input-date" id="fHasta" value="2026-05-14">
+    </div>
+    <button class="filter-clear" id="fClear" style="margin-left:auto">✕ Limpiar</button>
+    <span class="filter-active-count" id="fCount" style="display:none">0 activos</span>
+  </div>
+
+  <!-- 1. KPI CARDS -->
+  <div class="kpi-row">
+    <div class="kpi-card">
+      <div class="kpi-label">Total Reportes</div>
+      <div class="kpi-val" id="kpiTotal" style="color:var(--accent)">—</div>
+      <div class="kpi-sub">acumulado período</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Abiertos</div>
+      <div class="kpi-val" id="kpiAbiertos" style="color:var(--red)">—</div>
+      <div class="kpi-sub"><span class="down" id="kpiAbiertoPct">—%</span> del total</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Índice Frecuencia (IF)</div>
+      <div class="kpi-val" id="kpiIF" style="color:var(--orange)">—</div>
+      <div class="kpi-sub">acc. × 200.000 / h-h</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Índice Severidad (IS)</div>
+      <div class="kpi-val" id="kpiIS" style="color:var(--yellow)">—</div>
+      <div class="kpi-sub">días × 200.000 / h-h</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Índ. Lesión Incap. (ILI)</div>
+      <div class="kpi-val" id="kpiILI" style="color:var(--purple)">—</div>
+      <div class="kpi-sub">IF × IS / 1.000</div>
+    </div>
+  </div>
+
+  <!-- 2. CHARTS ROW -->
+  <div class="charts-row">
+
+    <!-- Donut: distribución por tipo de riesgo -->
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <div class="chart-card-title">Reportes por Tipo de Riesgo
+          <span>Distribución acumulada del período</span>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="chartRiesgo"></canvas>
+        <div class="doughnut-center">
+          <div class="dc-val" id="dcRiesgo">—</div>
+          <div class="dc-lbl">reportes</div>
+        </div>
+      </div>
+      <div class="chart-legend" id="legendRiesgo"></div>
+    </div>
+
+    <!-- Donut: distribución por sede -->
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <div class="chart-card-title">Distribución por Sede
+          <span>Álamos vs El Dorado</span>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="chartSede"></canvas>
+        <div class="doughnut-center">
+          <div class="dc-val" id="dcSede">—</div>
+          <div class="dc-lbl">sedes</div>
+        </div>
+      </div>
+      <div class="chart-legend" id="legendSede"></div>
+    </div>
+
+    <!-- Line: tendencia mensual de reportes -->
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <div class="chart-card-title">Tendencia Mensual
+          <span>Reportes abiertos vs cerrados</span>
+        </div>
+        <div class="trend-filters">
+          <button class="filter-btn active" onclick="setTrend('all',this)">Todo</button>
+          <button class="filter-btn" onclick="setTrend('open',this)">Abiertos</button>
+          <button class="filter-btn" onclick="setTrend('closed',this)">Cerrados</button>
+        </div>
+      </div>
+      <div class="chart-wrap chart-wrap-line">
+        <canvas id="chartTrend"></canvas>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 3. BOTTOM ROW: Barras por planta + Tabla de reportes -->
+  <div class="bottom-row">
+
+    <!-- Bar chart: reportes por planta -->
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <div class="chart-card-title">Reportes por Área / Planta
+          <span>Acumulado del período filtrado</span>
+        </div>
+      </div>
+      <div class="chart-wrap chart-wrap-bar">
+        <canvas id="chartPlanta"></canvas>
+      </div>
+    </div>
+
+    <!-- Tabla de reportes -->
+    <div class="table-card">
+      <div class="table-header-bar">
+        <div class="title">Registro de Reportes SST</div>
+        <input class="table-search" id="tSearch" type="text" placeholder="Buscar reporte, área, riesgo…" />
+      </div>
+      <div class="table-scroll">
+        <table id="mainTable">
+          <thead>
+            <tr>
+              <th onclick="sortTable('id')"># ▾</th>
+              <th onclick="sortTable('fecha')">Fecha ▾</th>
+              <th onclick="sortTable('sede')">Sede ▾</th>
+              <th onclick="sortTable('planta')">Área ▾</th>
+              <th onclick="sortTable('riesgo')">Tipo Riesgo ▾</th>
+              <th onclick="sortTable('descripcion')">Descripción</th>
+              <th onclick="sortTable('estado')">Estado ▾</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody id="mainTBody"></tbody>
+        </table>
+      </div>
+      <div class="table-pagination">
+        <span id="tInfo">Mostrando 0 de 0 registros</span>
+        <div class="page-btns" id="pageBtns"></div>
+      </div>
+    </div>
+
+  </div>
+
+</main>
+
+<!-- ═══════════════ MODAL: NUEVO REPORTE SST ═══════════════ -->
+<div class="modal-overlay" id="modalReporte">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Reportar Condición Insegura</div>
+        <div class="modal-sub">Complete el formulario · el reporte queda registrado en el sistema SST</div>
+      </div>
+      <button class="modal-close" id="closeModalReporte">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="form-error" id="formError"></div>
+
+      <!-- Fila 1: Fecha, Sede, Área -->
+      <div class="form-grid-3">
+        <div class="form-group">
+          <label class="form-label">Fecha <span class="req">*</span></label>
+          <input type="date" class="form-input" id="rFecha" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Sede <span class="req">*</span></label>
+          <select class="form-select" id="rSede">
+            <option value="">— Selecciona —</option>
+            <option value="ALAMOS">Álamos</option>
+            <option value="DORADO">El Dorado</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Área / Planta <span class="req">*</span></label>
+          <select class="form-select" id="rPlanta">
+            <option value="">— Selecciona —</option>
+            <option value="Tintorería">Tintorería</option>
+            <option value="Ramas">Ramas</option>
+            <option value="Circulares">Circulares</option>
+            <option value="Raschel">Raschel</option>
+            <option value="Tricot">Tricot</option>
+            <option value="Urdidos">Urdidos</option>
+            <option value="Confección">Confección</option>
+            <option value="Almacén">Almacén</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Fila 2: Reportado por, Cargo -->
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label class="form-label">Reportado por <span class="req">*</span></label>
+          <input type="text" class="form-input" id="rReportador" placeholder="Nombre completo" autocomplete="off" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Cargo / Rol</label>
+          <input type="text" class="form-input" id="rCargo" placeholder="Ej: Operario tejido" autocomplete="off" />
+        </div>
+      </div>
+
+      <!-- Tipo de riesgo (tiles) -->
+      <div class="form-group">
+        <label class="form-label">Tipo de Riesgo <span class="req">*</span></label>
+        <div class="radio-tiles" id="riesgoTiles">
+          <label class="radio-tile">
+            <input type="radio" name="rRiesgo" value="Mecánico" />
+            <span class="radio-tile-dot"></span> Mecánico
+          </label>
+          <label class="radio-tile">
+            <input type="radio" name="rRiesgo" value="Biológico" />
+            <span class="radio-tile-dot"></span> Biológico
+          </label>
+          <label class="radio-tile">
+            <input type="radio" name="rRiesgo" value="Químico" />
+            <span class="radio-tile-dot"></span> Químico
+          </label>
+          <label class="radio-tile">
+            <input type="radio" name="rRiesgo" value="Ergonómico" />
+            <span class="radio-tile-dot"></span> Ergonómico
+          </label>
+          <label class="radio-tile">
+            <input type="radio" name="rRiesgo" value="Locativo" />
+            <span class="radio-tile-dot"></span> Locativo
+          </label>
+          <label class="radio-tile">
+            <input type="radio" name="rRiesgo" value="Eléctrico" />
+            <span class="radio-tile-dot"></span> Eléctrico
+          </label>
+          <label class="radio-tile">
+            <input type="radio" name="rRiesgo" value="Psicosocial" />
+            <span class="radio-tile-dot"></span> Psicosocial
+          </label>
+        </div>
+      </div>
+
+      <!-- Nivel de riesgo + Ubicación exacta -->
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label class="form-label">Nivel de Riesgo <span class="req">*</span></label>
+          <select class="form-select" id="rNivel">
+            <option value="">— Selecciona —</option>
+            <option value="Bajo">Bajo</option>
+            <option value="Medio">Medio</option>
+            <option value="Alto">Alto</option>
+            <option value="Crítico">Crítico</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Ubicación exacta</label>
+          <input type="text" class="form-input" id="rUbicacion" placeholder="Ej: Nave 3 – máquina circular #7" />
+        </div>
+      </div>
+
+      <!-- Descripción -->
+      <div class="form-group">
+        <label class="form-label">Descripción de la condición insegura <span class="req">*</span></label>
+        <textarea class="form-textarea" id="rDescripcion" placeholder="Describa detalladamente la condición insegura observada, incluyendo los factores de riesgo presentes…" rows="4"></textarea>
+      </div>
+
+      <!-- Acción inmediata -->
+      <div class="form-group">
+        <label class="form-label">Acción inmediata tomada</label>
+        <textarea class="form-textarea" id="rAccion" placeholder="Indique si se tomó alguna acción correctiva inmediata (ej: señalización, bloqueo, aviso a supervisión)…" rows="2"></textarea>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" id="cancelModalReporte">Cancelar</button>
+      <button class="btn-submit" id="submitReporte">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+        Enviar Reporte
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ MODAL: DETALLE REPORTE ═══════════════ -->
+<div class="modal-overlay" id="modalDetalle">
+  <div class="modal modal-wide">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="detalleTitle">Detalle del Reporte #—</div>
+        <div class="modal-sub" id="detalleSub">—</div>
+      </div>
+      <button class="modal-close" id="closeModalDetalle">✕</button>
+    </div>
+    <div class="modal-body" id="detalleBody" style="gap:12px"></div>
+    <div class="modal-footer">
+      <button class="btn-cancel" id="closeDetalle2">Cerrar</button>
+      <button class="btn-submit" id="btnCambiarEstado" style="background:linear-gradient(135deg,#22c55e,#16a34a)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
+        Marcar en gestión
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>
+  <span id="toastMsg">Reporte registrado correctamente</span>
+</div>
+
+<!-- ═══════════════════════════ SCRIPT ════════════════════════════════ -->
+<script>
+/* ══════════════════════════════════════════════════════════════
+   API CONFIG
+══════════════════════════════════════════════════════════════ */
+const API = 'http://localhost:5000/api';
+
+let loadedData = { reportes: [], kpis: {}, tendencia: { meses:[], abiertos:[], cerrados:[] }, total: 0 };
+
+const RIESGO_COLORS = {
+  "Mecánico":    "#f97316",
+  "Biológico":   "#22c55e",
+  "Químico":     "#a855f7",
+  "Ergonómico":  "#4f8ef7",
+  "Locativo":    "#f59e0b",
+  "Eléctrico":   "#ef4444",
+  "Psicosocial": "#06b6d4",
+};
+const NIVEL_BADGE  = { "Bajo":"badge-green","Medio":"badge-yellow","Alto":"badge-orange","Crítico":"badge-red" };
+const ESTADO_BADGE = { "Abierto":"badge-red","En gestión":"badge-yellow","Cerrado":"badge-green" };
+
+// ── Fetch ──────────────────────────────────────────────────────────
+async function fetchData() {
+  const p = new URLSearchParams();
+  if (AF.sede   && AF.sede   !== "ALL") p.set("sede",   AF.sede);
+  if (AF.planta && AF.planta !== "ALL") p.set("planta", AF.planta);
+  if (AF.riesgo && AF.riesgo !== "ALL") p.set("riesgo", AF.riesgo);
+  if (AF.estado && AF.estado !== "ALL") p.set("estado", AF.estado);
+  if (AF.desde) p.set("desde", AF.desde);
+  if (AF.hasta) p.set("hasta", AF.hasta);
+  const res = await fetch(`${API}/sst?${p}`);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   FILTROS  (el filtrado lo hace el backend)
+══════════════════════════════════════════════════════════════ */
+const AF = { sede:"ALL", planta:"ALL", riesgo:"ALL", estado:"ALL", desde:"", hasta:"" };
+
+function bindFilters() {
+  const ids  = ["fSede","fPlanta","fRiesgo","fEstado"];
+  const keys = ["sede","planta","riesgo","estado"];
+  ids.forEach((id, i) => {
+    document.getElementById(id).addEventListener("change", async e => {
+      AF[keys[i]] = e.target.value;
+      updateFilterBadge(); await renderAll();
+    });
+  });
+  document.getElementById("fDesde").addEventListener("change", async e => { AF.desde = e.target.value; updateFilterBadge(); await renderAll(); });
+  document.getElementById("fHasta").addEventListener("change", async e => { AF.hasta = e.target.value; updateFilterBadge(); await renderAll(); });
+  document.getElementById("fClear").addEventListener("click", async () => {
+    AF.sede = AF.planta = AF.riesgo = AF.estado = "ALL";
+    AF.desde = ""; AF.hasta = "";
+    ["fSede","fPlanta","fRiesgo","fEstado"].forEach(id => document.getElementById(id).value = "ALL");
+    document.getElementById("fDesde").value = "2026-01-01";
+    document.getElementById("fHasta").value = "2026-05-14";
+    updateFilterBadge(); await renderAll();
+  });
+}
+
+function updateFilterBadge() {
+  const n = [AF.sede, AF.planta, AF.riesgo, AF.estado].filter(v => v !== "ALL").length
+           + (AF.desde ? 1 : 0) + (AF.hasta ? 1 : 0);
+  const badge = document.getElementById("fCount");
+  badge.textContent = n + " activo" + (n !== 1 ? "s" : "");
+  badge.style.display = n > 0 ? "inline" : "none";
+}
+
+/* ══════════════════════════════════════════════════════════════
+   KPIs  (calculados por el backend)
+══════════════════════════════════════════════════════════════ */
+function renderKPIs(kpis) {
+  const k = kpis || {};
+  document.getElementById("kpiTotal").textContent    = k.total    ?? 0;
+  document.getElementById("kpiAbiertos").textContent = k.abiertos ?? 0;
+  document.getElementById("kpiAbiertoPct").textContent = k.total ? Math.round((k.abiertos||0)/k.total*100)+"%" : "0%";
+  document.getElementById("kpiIF").textContent  = k.IF  ?? 0;
+  document.getElementById("kpiIS").textContent  = k.IS  ?? 0;
+  document.getElementById("kpiILI").textContent = k.ILI ?? 0;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   CHARTS  (data y tendencia vienen del backend)
+══════════════════════════════════════════════════════════════ */
+let chartRiesgo, chartSede, chartTrend, chartPlanta;
+
+function renderCharts(data, tendencia) {
+  /* — Donut riesgo — */
+  const riesgoMap = {};
+  data.forEach(r => { riesgoMap[r.riesgo] = (riesgoMap[r.riesgo]||0) + 1; });
+  const rLabels = Object.keys(riesgoMap);
+  const rVals   = rLabels.map(k => riesgoMap[k]);
+  const rColors = rLabels.map(k => RIESGO_COLORS[k] || "#8892a4");
+  document.getElementById("dcRiesgo").textContent = data.length;
+  if (chartRiesgo) chartRiesgo.destroy();
+  chartRiesgo = new Chart(document.getElementById("chartRiesgo").getContext("2d"), {
+    type: "doughnut",
+    data: { labels: rLabels, datasets: [{ data: rVals, backgroundColor: rColors, borderWidth: 2, borderColor: "#1e2130", hoverOffset: 6 }] },
+    options: { cutout:"70%", responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{callbacks:{label: c => ` ${c.label}: ${c.parsed} reportes`}} } }
+  });
+  document.getElementById("legendRiesgo").innerHTML = rLabels.map((l,i) => `
+    <div class="legend-item">
+      <div class="legend-dot" style="background:${rColors[i]}"></div>
+      <span style="color:var(--text)">${l}</span>
+      <span style="margin-left:auto;color:${rColors[i]};font-weight:700">${rVals[i]}</span>
+    </div>`).join("");
+
+  /* — Donut sede — */
+  const sedeMap = { ALAMOS: 0, DORADO: 0 };
+  data.forEach(r => { sedeMap[r.sede] = (sedeMap[r.sede]||0) + 1; });
+  const sLabels = ["Álamos","El Dorado"];
+  const sVals   = [sedeMap.ALAMOS || 0, sedeMap.DORADO || 0];
+  const sColors = ["#4f8ef7","#f97316"];
+  document.getElementById("dcSede").textContent = "2";
+  if (chartSede) chartSede.destroy();
+  chartSede = new Chart(document.getElementById("chartSede").getContext("2d"), {
+    type: "doughnut",
+    data: { labels: sLabels, datasets: [{ data: sVals, backgroundColor: sColors, borderWidth: 2, borderColor: "#1e2130", hoverOffset: 6 }] },
+    options: { cutout:"70%", responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{callbacks:{label: c => ` ${c.label}: ${c.parsed} reportes`}} } }
+  });
+  document.getElementById("legendSede").innerHTML = sLabels.map((l,i) => `
+    <div class="legend-item" style="flex:1 1 45%">
+      <div class="legend-dot" style="background:${sColors[i]}"></div>
+      <span style="color:var(--text)">${l}</span>
+      <span style="margin-left:auto;color:${sColors[i]};font-weight:700">${sVals[i]}</span>
+    </div>`).join("");
+
+  /* — Tendencia (datos desde el backend) — */
+  const td = tendencia || { meses:[], abiertos:[], cerrados:[] };
+  if (chartTrend) chartTrend.destroy();
+  chartTrend = new Chart(document.getElementById("chartTrend").getContext("2d"), {
+    type: "line",
+    data: {
+      labels: td.meses,
+      datasets: [
+        { label:"Abiertos", data: td.abiertos, borderColor:"#ef4444", backgroundColor:"rgba(239,68,68,.08)", tension:.4, borderWidth:2, pointRadius:4, fill:true },
+        { label:"Cerrados", data: td.cerrados, borderColor:"#22c55e", backgroundColor:"rgba(34,197,94,.06)", tension:.4, borderWidth:2, pointRadius:4, fill:true },
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins: { legend:{ display:true, labels:{ color:"#8892a4", boxWidth:12, font:{size:11} } }, tooltip:{ mode:"index", intersect:false } },
+      scales: {
+        x: { grid:{color:"rgba(255,255,255,.05)"}, ticks:{color:"#8892a4"} },
+        y: { beginAtZero:true, grid:{color:"rgba(255,255,255,.05)"}, ticks:{color:"#8892a4"} }
+      }
+    }
+  });
+
+  /* — Barras por planta — */
+  const plantaMap = {};
+  data.forEach(r => { plantaMap[r.planta] = (plantaMap[r.planta]||0) + 1; });
+  const pLabels = Object.keys(plantaMap).sort((a,b) => plantaMap[b]-plantaMap[a]);
+  const pVals   = pLabels.map(k => plantaMap[k]);
+  const pColors = ["#f97316","#ef4444","#a855f7","#4f8ef7","#22c55e","#f59e0b","#06b6d4","#84cc16"];
+  if (chartPlanta) chartPlanta.destroy();
+  chartPlanta = new Chart(document.getElementById("chartPlanta").getContext("2d"), {
+    type: "bar",
+    data: { labels: pLabels, datasets: [{ data: pVals, backgroundColor: pColors.slice(0, pLabels.length), borderRadius: 6, borderSkipped: false }] },
+    options: {
+      indexAxis: "y", responsive: true, maintainAspectRatio: false,
+      plugins: { legend:{display:false}, tooltip:{callbacks:{label: c => ` ${c.parsed.x} reportes`}} },
+      scales: {
+        x: { beginAtZero:true, grid:{color:"rgba(255,255,255,.05)"}, ticks:{color:"#8892a4", stepSize:1} },
+        y: { grid:{display:false}, ticks:{color:"#e2e8f0", font:{size:11}} }
+      }
+    }
+  });
+}
+
+window.setTrend = function(mode, btn) {
+  btn.closest(".trend-filters").querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  const ds = chartTrend.data.datasets;
+  if (mode === "all")    { ds.forEach(d => d.hidden = false); }
+  else if (mode === "open")   { ds[0].hidden = false; ds[1].hidden = true; }
+  else { ds[0].hidden = true; ds[1].hidden = false; }
+  chartTrend.update();
+};
+
+/* ══════════════════════════════════════════════════════════════
+   TABLE
+══════════════════════════════════════════════════════════════ */
+let tableData = [], sortKey = "", sortAsc = true, currentPage = 1;
+const PAGE_SIZE = 8;
+
+function riesgoBadgeClass(r) {
+  return ({ "Mecánico":"badge-orange","Biológico":"badge-green","Químico":"badge-purple","Ergonómico":"badge-blue","Locativo":"badge-yellow","Eléctrico":"badge-red","Psicosocial":"badge-cyan" }[r]) || "badge-blue";
+}
+
+function renderTable() {
+  const q = (document.getElementById("tSearch").value || "").toLowerCase();
+  const filt = tableData.filter(r =>
+    r.descripcion.toLowerCase().includes(q) ||
+    r.planta.toLowerCase().includes(q) ||
+    r.riesgo.toLowerCase().includes(q) ||
+    r.reportador.toLowerCase().includes(q) ||
+    String(r.id).includes(q)
+  );
+  const total = filt.length;
+  const pages = Math.ceil(total / PAGE_SIZE);
+  currentPage = Math.min(currentPage, pages || 1);
+  const slice = filt.slice((currentPage-1)*PAGE_SIZE, currentPage*PAGE_SIZE);
+
+  const tbody = document.getElementById("mainTBody");
+  tbody.innerHTML = slice.map(r => `
+    <tr>
+      <td style="color:var(--muted);font-weight:600">#${String(r.id).padStart(3,"0")}</td>
+      <td>${r.fecha}</td>
+      <td><span class="badge ${r.sede==="ALAMOS"?"badge-blue":"badge-orange"}">${r.sede==="ALAMOS"?"Álamos":"Dorado"}</span></td>
+      <td>${r.planta}</td>
+      <td><span class="badge ${riesgoBadgeClass(r.riesgo)}">${r.riesgo}</span></td>
+      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;color:var(--muted)">${r.descripcion.slice(0,55)}…</td>
+      <td><span class="badge ${ESTADO_BADGE[r.estado]||"badge-blue"}">${r.estado}</span></td>
+      <td><button onclick="verDetalle(${r.id})" style="background:rgba(79,142,247,.12);border:1px solid rgba(79,142,247,.25);border-radius:6px;color:#4f8ef7;padding:3px 10px;font-size:11px;cursor:pointer;transition:all .12s" onmouseover="this.style.background='rgba(79,142,247,.25)'" onmouseout="this.style.background='rgba(79,142,247,.12)'">Ver</button></td>
+    </tr>`).join("");
+
+  document.getElementById("tInfo").textContent = `Mostrando ${slice.length} de ${total} registros`;
+
+  const pb = document.getElementById("pageBtns");
+  pb.innerHTML = "";
+  const addBtn = (label, page, active=false) => {
+    const b = document.createElement("button");
+    b.className = "page-btn" + (active ? " active" : "");
+    b.textContent = label;
+    b.onclick = () => { currentPage = page; renderTable(); };
+    pb.appendChild(b);
+  };
+  if (currentPage > 1) addBtn("‹", currentPage - 1);
+  for (let p = Math.max(1, currentPage-1); p <= Math.min(pages, currentPage+2); p++) addBtn(p, p, p === currentPage);
+  if (currentPage < pages) addBtn("›", currentPage + 1);
+}
+
+window.sortTable = function(key) {
+  if (sortKey === key) sortAsc = !sortAsc; else { sortKey = key; sortAsc = true; }
+  tableData.sort((a,b) => {
+    const va = a[key], vb = b[key];
+    if (typeof va === "number") return sortAsc ? va-vb : vb-va;
+    return sortAsc ? String(va).localeCompare(String(vb)) : String(vb).localeCompare(String(va));
+  });
+  currentPage = 1; renderTable();
+};
+
+document.getElementById("tSearch").addEventListener("input", () => { currentPage = 1; renderTable(); });
+
+/* ══════════════════════════════════════════════════════════════
+   DETALLE REPORTE
+══════════════════════════════════════════════════════════════ */
+let detalleId = null;
+window.verDetalle = function(id) {
+  detalleId = id;
+  const r = loadedData.reportes.find(x => x.id === id);
+  if (!r) return;
+  document.getElementById("detalleTitle").textContent = `Detalle del Reporte #${String(r.id).padStart(3,"0")}`;
+  document.getElementById("detalleSub").textContent   = `${r.fecha} · ${r.planta} · ${r.sede === "ALAMOS" ? "Sede Álamos" : "Sede El Dorado"}`;
+
+  const nivelColor = { "Bajo":"#22c55e","Medio":"#f59e0b","Alto":"#f97316","Crítico":"#ef4444" }[r.nivel] || "#8892a4";
+  document.getElementById("detalleBody").innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      ${campo("Reportado por", r.reportador)}
+      ${campo("Cargo", r.cargo || "—")}
+      ${campo("Tipo de Riesgo", `<span class="badge ${riesgoBadgeClass(r.riesgo)}">${r.riesgo}</span>`)}
+      ${campo("Nivel de Riesgo", `<span style="color:${nivelColor};font-weight:700">${r.nivel}</span>`)}
+      ${campo("Ubicación exacta", r.ubicacion || "—")}
+      ${campo("Estado actual", `<span class="badge ${ESTADO_BADGE[r.estado]}">${r.estado}</span>`)}
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px">
+      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;font-weight:600">Descripción de la condición insegura</div>
+      <div style="font-size:13px;line-height:1.6;color:var(--text)">${r.descripcion}</div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px">
+      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;font-weight:600">Acción inmediata tomada</div>
+      <div style="font-size:13px;line-height:1.6;color:var(--text)">${r.accion || "Ninguna acción reportada."}</div>
+    </div>`;
+
+  const btnCambiar = document.getElementById("btnCambiarEstado");
+  if (r.estado === "Cerrado") {
+    btnCambiar.style.display = "none";
+  } else {
+    btnCambiar.style.display = "flex";
+    btnCambiar.textContent = r.estado === "Abierto" ? "Marcar en gestión" : "Marcar como cerrado";
+    btnCambiar.style.background = r.estado === "Abierto"
+      ? "linear-gradient(135deg,#f59e0b,#d97706)"
+      : "linear-gradient(135deg,#22c55e,#16a34a)";
+  }
+  document.getElementById("modalDetalle").classList.add("open");
+};
+
+function campo(label, val) {
+  return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px">
+    <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px;font-weight:600">${label}</div>
+    <div style="font-size:13px;color:var(--text)">${val}</div>
+  </div>`;
+}
+
+document.getElementById("btnCambiarEstado").addEventListener("click", async () => {
+  const r = loadedData.reportes.find(x => x.id === detalleId);
+  if (!r) return;
+  const nuevoEstado = r.estado === "Abierto" ? "En gestión" : "Cerrado";
+  try {
+    const res = await fetch(`${API}/sst/${detalleId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ estado: nuevoEstado })
+    });
+    if (!res.ok) throw new Error("Error actualizando estado");
+    document.getElementById("modalDetalle").classList.remove("open");
+    await renderAll();
+    showToast("Estado del reporte actualizado correctamente");
+  } catch (e) {
+    console.error(e);
+    showToast("Error al actualizar el estado");
+  }
+});
+
+document.getElementById("closeModalDetalle").addEventListener("click", () => document.getElementById("modalDetalle").classList.remove("open"));
+document.getElementById("closeDetalle2").addEventListener("click",     () => document.getElementById("modalDetalle").classList.remove("open"));
+
+/* ══════════════════════════════════════════════════════════════
+   MODAL NUEVO REPORTE
+══════════════════════════════════════════════════════════════ */
+function openModalReporte() {
+  const today = new Date().toISOString().slice(0,10);
+  document.getElementById("rFecha").value = today;
+  document.getElementById("rSede").value = "";
+  document.getElementById("rPlanta").value = "";
+  document.getElementById("rReportador").value = "";
+  document.getElementById("rCargo").value = "";
+  document.getElementById("rNivel").value = "";
+  document.getElementById("rUbicacion").value = "";
+  document.getElementById("rDescripcion").value = "";
+  document.getElementById("rAccion").value = "";
+  document.querySelectorAll('input[name="rRiesgo"]').forEach(r => r.checked = false);
+  document.getElementById("formError").style.display = "none";
+  document.getElementById("modalReporte").classList.add("open");
+}
+
+document.getElementById("btnNuevoReporte").addEventListener("click", openModalReporte);
+document.getElementById("closeModalReporte").addEventListener("click",  () => document.getElementById("modalReporte").classList.remove("open"));
+document.getElementById("cancelModalReporte").addEventListener("click", () => document.getElementById("modalReporte").classList.remove("open"));
+
+document.getElementById("modalReporte").addEventListener("click", e => {
+  if (e.target === document.getElementById("modalReporte"))
+    document.getElementById("modalReporte").classList.remove("open");
+});
+document.getElementById("modalDetalle").addEventListener("click", e => {
+  if (e.target === document.getElementById("modalDetalle"))
+    document.getElementById("modalDetalle").classList.remove("open");
+});
+
+document.getElementById("submitReporte").addEventListener("click", async () => {
+  const fecha      = document.getElementById("rFecha").value;
+  const sede       = document.getElementById("rSede").value;
+  const planta     = document.getElementById("rPlanta").value;
+  const reportador = document.getElementById("rReportador").value.trim();
+  const cargo      = document.getElementById("rCargo").value.trim();
+  const nivel      = document.getElementById("rNivel").value;
+  const ubicacion  = document.getElementById("rUbicacion").value.trim();
+  const desc       = document.getElementById("rDescripcion").value.trim();
+  const accion     = document.getElementById("rAccion").value.trim();
+  const riesgoEl   = document.querySelector('input[name="rRiesgo"]:checked');
+  const riesgo     = riesgoEl ? riesgoEl.value : "";
+
+  const errores = [];
+  if (!fecha)      errores.push("La fecha es obligatoria.");
+  if (!sede)       errores.push("Selecciona la sede.");
+  if (!planta)     errores.push("Selecciona el área / planta.");
+  if (!reportador) errores.push("El nombre de quien reporta es obligatorio.");
+  if (!riesgo)     errores.push("Selecciona el tipo de riesgo.");
+  if (!nivel)      errores.push("Selecciona el nivel de riesgo.");
+  if (!desc)       errores.push("La descripción es obligatoria.");
+
+  const errEl = document.getElementById("formError");
+  if (errores.length) {
+    errEl.innerHTML = errores.map(e => `• ${e}`).join("<br>");
+    errEl.style.display = "block";
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API}/sst`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ fecha, sede, planta, riesgo, nivel, descripcion: desc, accion, reportador, cargo, ubicacion })
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      errEl.innerHTML = (err.errors || ["Error al guardar"]).map(e => `• ${e}`).join("<br>");
+      errEl.style.display = "block";
+      return;
+    }
+    const created = await res.json();
+    document.getElementById("modalReporte").classList.remove("open");
+    await renderAll();
+    showToast(`Reporte #${String(created.id).padStart(3,"0")} registrado correctamente`);
+  } catch (e) {
+    errEl.innerHTML = "• Error de conexión con el servidor.";
+    errEl.style.display = "block";
+  }
+});
+
+/* ══════════════════════════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════════════════════════ */
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  document.getElementById("toastMsg").textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 3500);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   RENDER ALL  (async, consume el backend)
+══════════════════════════════════════════════════════════════ */
+async function renderAll() {
+  try {
+    loadedData = await fetchData();
+    renderKPIs(loadedData.kpis);
+    renderCharts(loadedData.reportes, loadedData.tendencia);
+    tableData = [...loadedData.reportes];
+    currentPage = 1;
+    renderTable();
+  } catch (err) {
+    console.error("Error cargando datos SST:", err);
+    showToast("Error conectando al servidor. Verifica que el backend esté activo.");
+  }
+}
+
+// ── Indicador de estado de conexión ───────────────────────────────
+function setApiStatus(ok, msg) {
+  document.getElementById("apiDot").style.background = ok ? "#22c55e" : "#ef4444";
+  document.getElementById("apiDot").style.boxShadow  = ok ? "0 0 6px #22c55e88" : "0 0 6px #ef444488";
+  document.getElementById("apiLabel").textContent    = msg;
+  document.getElementById("apiLabel").style.color    = ok ? "#22c55e" : "#ef4444";
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  bindFilters();
+  try {
+    await renderAll();
+    setApiStatus(true, "API conectada · localhost:5000");
+  } catch {
+    setApiStatus(false, "Sin conexión al backend");
+  }
+});
+</script>
+</body>
+</html>
