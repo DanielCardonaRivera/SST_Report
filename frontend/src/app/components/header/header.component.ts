@@ -10,7 +10,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
       </div>
       <div class="header-center">
         <h1>Gestión de Seguridad Laboral</h1>
-        <p>Reporte y seguimiento de condiciones inseguras · PROTELA S.A. 2026</p>
+        <p>Reporte y seguimiento de condiciones inseguras · TEXTILES S.A. 2026</p>
       </div>
       <div class="header-right">
         <div class="api-status">

@@ -1,46 +1,51 @@
-# SST Report – PROTELA S.A.
+# SST Report – TEXTILES S.A.
 
-Dashboard de gestión y seguimiento de condiciones inseguras para PROTELA S.A., con backend Flask + SQLite y frontend Angular 17.
-
----
-
-## Estructura del proyecto
-
-```
-SST_Report/
-├── backend/
-│   ├── app.py           # API Flask
-│   ├── requirements.txt
-│   └── sst.db           # generado automáticamente al iniciar
-├── frontend/
-│   ├── angular.json
-│   ├── package.json
-│   ├── proxy.conf.json
-│   ├── tsconfig.json
-│   └── src/
-│       ├── main.ts
-│       ├── styles.scss
-│       └── app/
-│           ├── app.component.*
-│           ├── app.config.ts
-│           ├── models/sst.models.ts
-│           ├── services/sst.service.ts
-│           └── components/
-│               ├── header/
-│               ├── filter-bar/
-│               ├── kpi-cards/
-│               ├── charts-row/
-│               ├── planta-chart/
-│               ├── reports-table/
-│               ├── new-report-modal/
-│               └── report-detail-modal/
-├── MOCKUP_SST.html      # prototipo estático original
-└── README.md
-```
+Dashboard de gestión y seguimiento de condiciones inseguras para TEXTILES S.A., con backend Flask + SQLite y frontend Angular 17.
 
 ---
 
-## Requisitos
+## Inicio rápido
+
+Hay dos formas de correr el proyecto: **con Docker** (recomendado, sin instalar nada extra) o **en modo desarrollo** (para editar código).
+
+---
+
+## Opción A — Docker (recomendado)
+
+### Requisitos
+
+| Herramienta | Versión mínima |
+|---|---|
+| Docker Desktop | 4.x |
+
+### Pasos
+
+```bash
+# 1. Clonar el repositorio
+git clone https://github.com/<tu-usuario>/SST_Report.git
+cd SST_Report
+
+# 2. Construir y levantar los contenedores
+docker-compose up --build
+
+# 3. Abrir en el navegador
+#    Frontend → http://localhost:4200
+#    Backend  → http://localhost:5000
+```
+
+Para detener:
+
+```bash
+docker-compose down
+```
+
+> La base de datos `backend/sst.db` se crea automáticamente en la primera ejecución con 30 registros de ejemplo. Se persiste en el host mediante un volumen de Docker, por lo que los datos sobreviven al reinicio de los contenedores.
+
+---
+
+## Opción B — Desarrollo local
+
+### Requisitos
 
 | Herramienta | Versión mínima |
 |---|---|
@@ -48,17 +53,14 @@ SST_Report/
 | Node.js | 18+ |
 | npm | 9+ |
 
----
-
-## Puesta en marcha
-
 ### 1 · Backend (Flask)
 
 ```bash
 cd backend
 
-# Crear y activar entorno virtual (recomendado)
+# Crear y activar entorno virtual
 python -m venv .venv
+
 # Windows:
 .venv\Scripts\activate
 # macOS / Linux:
@@ -71,12 +73,11 @@ pip install -r requirements.txt
 python app.py
 ```
 
-El backend queda disponible en `http://localhost:5000`.  
-La base de datos `sst.db` se crea automáticamente en la primera ejecución con 30 registros de ejemplo.
-
----
+El backend queda disponible en `http://localhost:5000`.
 
 ### 2 · Frontend (Angular)
+
+Abrir una segunda terminal:
 
 ```bash
 cd frontend
@@ -90,19 +91,32 @@ npm start
 
 Abrir `http://localhost:4200` en el navegador.
 
-> El archivo `proxy.conf.json` redirige todas las peticiones `/api/*` al backend Flask, evitando problemas de CORS en desarrollo.
+> `proxy.conf.json` redirige todas las peticiones `/api/*` al backend Flask para evitar problemas de CORS en desarrollo.
 
 ---
 
-### 3 · Build de producción
+## Estructura del proyecto
 
-```bash
-cd frontend
-npm run build
-# Artefactos en frontend/dist/sst-report/
 ```
-
-Para servir el build desde Flask se puede añadir una ruta estática en `app.py` apuntando a `dist/sst-report/browser/`.
+SST_Report/
+├── backend/
+│   ├── app.py              # API Flask
+│   ├── requirements.txt
+│   └── sst.db              # generado automáticamente al iniciar
+├── docker/
+│   ├── backend.Dockerfile
+│   ├── frontend.Dockerfile
+│   └── nginx.conf
+├── frontend/
+│   ├── proxy.conf.json     # proxy de desarrollo → Flask :5000
+│   └── src/
+│       └── app/
+│           ├── models/
+│           ├── services/
+│           └── components/
+├── docker-compose.yml
+└── README.md
+```
 
 ---
 
@@ -115,7 +129,7 @@ Para servir el build desde Flask se puede añadir una ruta estática en `app.py`
 | `POST` | `/api/sst_add_report` | Crea un nuevo reporte (estado inicial: Abierto) |
 | `PUT` | `/api/sst_update_report/<id>` | Actualiza el estado de un reporte |
 
-### Parámetros de filtro para `GET /api/sst_data`
+### Parámetros de filtro — `GET /api/sst_data`
 
 | Parámetro | Ejemplo | Descripción |
 |---|---|---|
@@ -126,38 +140,11 @@ Para servir el build desde Flask se puede añadir una ruta estática en `app.py`
 | `desde` | `2026-01-01` | Fecha de inicio (YYYY-MM-DD) |
 | `hasta` | `2026-05-14` | Fecha de fin (YYYY-MM-DD) |
 
-### Ejemplo — crear reporte
-
-```bash
-curl -X POST http://localhost:5000/api/sst_add_report \
-  -H "Content-Type: application/json" \
-  -d '{
-    "fecha": "2026-05-24",
-    "sede": "ALAMOS",
-    "planta": "Tintorería",
-    "riesgo": "Químico",
-    "nivel": "Alto",
-    "descripcion": "Descripción de la condición insegura.",
-    "reportador": "Juan Pérez",
-    "cargo": "Operario",
-    "ubicacion": "Nave 1",
-    "accion": "Se señalizó el área."
-  }'
-```
-
-### Ejemplo — cambiar estado
-
-```bash
-curl -X PUT http://localhost:5000/api/sst_update_report/1 \
-  -H "Content-Type: application/json" \
-  -d '{"estado": "En gestión"}'
-```
-
 ---
 
 ## KPIs calculados
 
-Los indicadores se calculan sobre el conjunto de reportes filtrado, usando **85 000 h-h** de período como denominador.
+Los indicadores se calculan sobre el conjunto filtrado, usando **85 000 h-h** como denominador.
 
 | Indicador | Fórmula |
 |---|---|
@@ -171,4 +158,5 @@ Los indicadores se calculan sobre el conjunto de reportes filtrado, usando **85 
 
 - **Backend**: Python 3, Flask 3, Flask-CORS, SQLite 3
 - **Frontend**: Angular 17 (standalone components), Chart.js 4, TypeScript 5.4
+- **Infraestructura**: Docker, Docker Compose, nginx
 - **Estilos**: SCSS con tema oscuro propio (sin frameworks externos)
