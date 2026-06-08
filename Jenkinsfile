@@ -10,8 +10,13 @@ pipeline {
     }
     stage('Build frontend') {
       steps {
-        sh 'npm ci --prefix frontend'
-        sh 'npm run build --prefix frontend'
+        script {
+          // Run npm inside an official Node image so Jenkins doesn't need Node installed
+          docker.image('node:18-alpine').inside {
+            sh 'npm ci --prefix frontend'
+            sh 'npm run build --prefix frontend'
+          }
+        }
       }
     }
     stage('Backend smoke') {
