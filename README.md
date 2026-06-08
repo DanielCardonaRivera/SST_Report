@@ -18,25 +18,59 @@ Hay dos formas de correr el proyecto: **con Docker** (recomendado, sin instalar 
 |---|---|
 | Docker Desktop | 4.x |
 
-### Pasos
+### 1. Arrancar el frontend y backend
 
 ```bash
 # 1. Clonar el repositorio
 git clone https://github.com/<tu-usuario>/SST_Report.git
 cd SST_Report
 
-# 2. Construir y levantar los contenedores
-docker-compose up --build
+# 2. Construir y levantar frontend + backend
+docker compose -f docker-compose.yml up --build
 
-# 3. Abrir en el navegador
-#    Frontend → http://localhost:4200
-#    Backend  → http://localhost:5000
+# Alternativa si usas la versión clásica de Compose:
+# docker-compose -f docker-compose.yml up --build
 ```
 
-Para detener:
+Abrir en el navegador:
+
+- Frontend → http://localhost:4200
+- Backend  → http://localhost:5000
+
+### 2. Arrancar Jenkins (CI)
 
 ```bash
-docker-compose down
+# Levantar Jenkins con su propio docker-compose
+docker compose -f docker-compose.jenkins.yml up --build -d
+
+# Alternativa clásica:
+# docker-compose -f docker-compose.jenkins.yml up --build -d
+```
+
+Abrir Jenkins en:
+
+- http://localhost:8080
+
+### 3. Obtener la contraseña inicial de Jenkins
+
+```bash
+docker compose -f docker-compose.jenkins.yml exec -T jenkins cat /var/jenkins_home/secrets/initialAdminPassword
+```
+
+Si la versión clásica de Docker Compose es la tuya:
+
+```bash
+docker-compose -f docker-compose.jenkins.yml exec -T jenkins cat /var/jenkins_home/secrets/initialAdminPassword
+```
+
+### 4. Detener los servicios
+
+```bash
+# Frontend + backend
+docker compose -f docker-compose.yml down
+
+# Jenkins
+docker compose -f docker-compose.jenkins.yml down
 ```
 
 > La base de datos `backend/sst.db` se crea automáticamente en la primera ejecución con 30 registros de ejemplo. Se persiste en el host mediante un volumen de Docker, por lo que los datos sobreviven al reinicio de los contenedores.

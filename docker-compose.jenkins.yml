@@ -1,7 +1,10 @@
 version: '3.8'
 services:
   jenkins:
-    image: jenkins/jenkins:lts
+    build:
+      context: .
+      dockerfile: docker/jenkins.Dockerfile
+    image: sst_report-jenkins
     restart: unless-stopped
     ports:
       - "8080:8080"
