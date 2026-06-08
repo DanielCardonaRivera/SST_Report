@@ -6,7 +6,8 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - ./backend/sst.db:/app/sst.db
+      # Use a Docker named volume to avoid Windows host permission issues
+      - backend-data:/app
 
   frontend:
     build:
@@ -16,3 +17,6 @@ services:
       - "4200:80"
     depends_on:
       - backend
+
+volumes:
+  backend-data:
