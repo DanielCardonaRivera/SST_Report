@@ -150,5 +150,3 @@ pipeline {
 - Definir política de aprobación y seguridad para el acceso a credenciales de producción.
 
 ---
-
-Si quieres, lo convierto en una presentación corta (PowerPoint) o en un `README` más formal con secciones expandibles. También puedo adaptar el archivo para una política de seguridad CFG (ej.: requisitos exactos de memoria/CPU según el número de builds concurrentes esperado).
