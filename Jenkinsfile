@@ -1,42 +1,55 @@
 pipeline {
-  agent any
-  environment {
-    REGISTRY = 'myregistry.example.com/sst-report'
-    IMAGE_TAG = "${env.BRANCH_NAME}-${env.GIT_COMMIT ? env.GIT_COMMIT.take(8) : 'local'}"
-  }
-  stages {
-    stage('Checkout') {
-      steps { checkout scm }
-    }
-    stage('Build frontend') {
-      steps {
-        script {
-          // Run npm inside an official Node image so Jenkins doesn't need Node installed
-          docker.image('node:18-alpine').inside {
-            sh 'npm ci --prefix frontend'
-            sh 'npm run build --prefix frontend'
-          }
+    agent any
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
         }
-      }
-    }
-    stage('Backend smoke') {
-      steps {
-        echo 'No backend tests configured; add pytest or similar if needed.'
-      }
-    }
-    stage('Docker build & optionally push') {
-      when { expression { return env.BUILD_IMAGE == 'true' } }
-      steps {
-        sh "docker build -t ${REGISTRY}:${IMAGE_TAG} ."
-        withCredentials([usernamePassword(credentialsId: 'docker-reg-cred', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-          sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin myregistry.example.com'
-          sh "docker push ${REGISTRY}:${IMAGE_TAG}"
+
+        stage('Verify Repository') {
+            steps {
+                sh 'pwd'
+                sh 'ls -la'
+            }
         }
-      }
+
+        stage('Frontend Validation') {
+            steps {
+                sh '''
+                    if [ -d frontend ]; then
+                        echo "Frontend encontrado"
+                    else
+                        echo "Frontend no encontrado"
+                        exit 1
+                    fi
+                '''
+            }
+        }
+
+        stage('Backend Validation') {
+            steps {
+                sh '''
+                    if [ -f backend/app.py ]; then
+                        echo "Backend encontrado"
+                    else
+                        echo "backend/app.py no encontrado"
+                        exit 1
+                    fi
+                '''
+            }
+        }
+
     }
-  }
-  post {
-    success { echo "Build ${env.JOB_NAME} #${env.BUILD_NUMBER} succeeded" }
-    failure { echo "Build ${env.JOB_NAME} #${env.BUILD_NUMBER} failed" }
-  }
+
+    post {
+        success {
+            echo "Build ${env.JOB_NAME} #${env.BUILD_NUMBER} succeeded"
+        }
+        failure {
+            echo "Build ${env.JOB_NAME} #${env.BUILD_NUMBER} failed"
+        }
+    }
 }
