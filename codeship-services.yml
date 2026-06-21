@@ -1,0 +1,4 @@
+app:
+  build:
+    image: sst-report-backend
+    dockerfile: docker/backend.Dockerfile
