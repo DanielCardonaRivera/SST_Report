@@ -9,47 +9,32 @@ pipeline {
             }
         }
 
-        stage('Verify Repository') {
+        stage('Validate Project') {
             steps {
-                sh 'pwd'
+                sh 'echo SST_Report CI Pipeline'
                 sh 'ls -la'
             }
         }
 
-        stage('Frontend Validation') {
+        stage('Frontend') {
             steps {
-                sh '''
-                    if [ -d frontend ]; then
-                        echo "Frontend encontrado"
-                    else
-                        echo "Frontend no encontrado"
-                        exit 1
-                    fi
-                '''
+                sh 'test -d frontend'
             }
         }
 
-        stage('Backend Validation') {
+        stage('Backend') {
             steps {
-                sh '''
-                    if [ -f backend/app.py ]; then
-                        echo "Backend encontrado"
-                    else
-                        echo "backend/app.py no encontrado"
-                        exit 1
-                    fi
-                '''
+                sh 'test -f backend/app.py'
             }
         }
-
     }
 
     post {
         success {
-            echo "Build ${env.JOB_NAME} #${env.BUILD_NUMBER} succeeded"
+            echo 'Build SUCCESS'
         }
         failure {
-            echo "Build ${env.JOB_NAME} #${env.BUILD_NUMBER} failed"
+            echo 'Build FAILURE'
         }
     }
 }
